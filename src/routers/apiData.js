@@ -31,9 +31,18 @@ router.get('/apiData', async (req, res) => {
   }
 });
 
-router.get('/dbData', async (req, res) => {
+router.get('/tableData', async (req, res) => {
   try {
     const dbData = await Data.find({});
+    res.send(dbData);
+  } catch (e) {
+    res.send({ error: e });
+  }
+});
+
+router.get('/chartData', async (req, res) => {
+  try {
+    const dbData = await Data.find({}).sort({ createdAt: -1 }).limit(100);
     res.send(dbData);
   } catch (e) {
     res.send({ error: e });

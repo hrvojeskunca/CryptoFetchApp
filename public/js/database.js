@@ -3,6 +3,9 @@ const $stop = document.querySelector('#stop');
 const $once = document.querySelector('#once');
 const $downloadCsv = document.querySelector('#download-csv');
 const $errorMessage = document.querySelector('#errorMessage');
+const $btcChart = document.querySelector('#btcChart');
+const $ethChart = document.querySelector('#ethChart');
+const $bchChart = document.querySelector('#bchChart');
 
 /* TABLE */
 
@@ -150,46 +153,75 @@ const bchConfig = {
   },
 };
 
-const btc = document.getElementById('btc').getContext('2d');
-const btcChart = new Chart(btc, btcConfig);
-
-const eth = document.getElementById('eth').getContext('2d');
-const ethChart = new Chart(eth, ethConfig);
-
-const bch = document.getElementById('bch').getContext('2d');
-const bchChart = new Chart(bch, bchConfig);
-
 /* FETCH */
 
-const dbFetch = () => {
-  fetch('/dbData').then((res) => {
+/* Table Update */
+const tableFetch = () => {
+  fetch('/tableData').then((res) => {
     res.json().then((data) => {
-      /* Table Update */
       const tableData = [];
       data.forEach((element) => {
         tableData.push(element.btc, element.eth, element.bch);
       });
-      table.addData(tableData, true).catch(e => console.log(e));
+      table.setData(tableData, true).catch(e => console.log(e));
+    }).catch((e) => {
+      $errorMessage.textContent = e;
+    });
+  });
+};
 
-      /* BTC Chart Update */
+/* BTC Chart Update */
+const btcFetch = () => {
+  const btc = document.getElementById('btc').getContext('2d');
+  const btcChart = new Chart(btc, btcConfig);
+  fetch('/chartData').then((res) => {
+    res.json().then((data) => {
       data.forEach((element) => {
         btcConfig.data.labels.push('');
         btcConfig.data.datasets[0].data.push(element.btc.price);
-        btcChart.update();
+        btcChart.update({
+          duration: 0,
+        });
       });
+    }).catch((e) => {
+      $errorMessage.textContent = e;
+    });
+  });
+};
 
-      /* ETH Chart Update */
+
+/* ETH Chart Update */
+const ethFetch = () => {
+  const eth = document.getElementById('eth').getContext('2d');
+  const ethChart = new Chart(eth, ethConfig);
+  fetch('/chartData').then((res) => {
+    res.json().then((data) => {
       data.forEach((element) => {
         ethConfig.data.labels.push('');
         ethConfig.data.datasets[0].data.push(element.eth.price);
-        ethChart.update();
+        ethChart.update({
+          duration: 0,
+        });
       });
+    }).catch((e) => {
+      $errorMessage.textContent = e;
+    });
+  });
+};
 
-      /* BCH Chart Update */
+
+/* BCH Chart Update */
+const bchFetch = () => {
+  const bch = document.getElementById('bch').getContext('2d');
+  const bchChart = new Chart(bch, bchConfig);
+  fetch('/chartData').then((res) => {
+    res.json().then((data) => {
       data.forEach((element) => {
         bchConfig.data.labels.push('');
         bchConfig.data.datasets[0].data.push(element.bch.price);
-        bchChart.update();
+        bchChart.update({
+          duration: 0,
+        });
       });
     }).catch((e) => {
       $errorMessage.textContent = e;
@@ -201,5 +233,20 @@ const dbFetch = () => {
 
 $once.addEventListener('click', (e) => {
   e.preventDefault();
-  dbFetch();
+  tableFetch();
+});
+
+$btcChart.addEventListener('click', (e) => {
+  e.preventDefault();
+  btcFetch();
+});
+
+$ethChart.addEventListener('click', (e) => {
+  e.preventDefault();
+  ethFetch();
+});
+
+$bchChart.addEventListener('click', (e) => {
+  e.preventDefault();
+  bchFetch();
 });
